@@ -1,0 +1,171 @@
+<?php
+
+// $Id: $
+
+/**
+ * @file
+ * The CiviCRM Token module.
+ *
+ * The CiviCRM Token module provides tokens for CiviCRM Contact object.
+ *
+ * @ingroup civicrm
+ */
+
+/**
+ * Implementation of hook_token_list().
+ */
+function civicrm_token_token_list($type = 'all') {
+  $tokens = array();
+  
+  if ($type == 'contact' || $type == 'all') {
+
+    $civicrm_root = drupal_get_path('module', 'civicrm') . '/..';    
+    require_once $civicrm_root . '/civicrm.config.php';
+    require_once $civicrm_root . '/CRM/Core/Config.php';
+    require_once $civicrm_root . '/api/v2/Contact.php';
+
+    // Contact tokens
+    $contactFields =& CRM_Contact_DAO_Contact::fields( );
+    foreach ($contactFields as $field) {
+      if ($field['export']) {
+        $tokens['contact'][$field['name']] = $field['title'];
+      }
+    }
+    
+    // Address tokens
+    $addressFields =& CRM_Core_DAO_Address::fields( );
+    foreach ($addressFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['address_'.$field['name']] = $field['title'];
+      }
+    }
+    
+    // Email tokens
+    $emailFields =& CRM_Core_DAO_Email::fields( );
+    foreach ($emailFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['email_'.$field['name']] = $field['title'];
+      }
+    }
+    
+    // Phone tokens
+    $phoneFields =& CRM_Core_DAO_Phone::fields( );
+    foreach ($phoneFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['phone_'.$field['name']] = $field['title'];
+      }
+    }
+    
+  }
+
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function civicrm_token_token_values($type, $object = NULL) {
+  $values = array();
+  switch ($type) {
+    case 'contact':
+      $contact = (object)$object;
+      
+      // TODO remove
+//      dpm($contact);
+      
+      if ( $contact->id ) { 
+        // Contact tokens.
+        // see CRM/Contact/DAO/Contact.PHP for field definitions
+        $contactFields =& CRM_Contact_DAO_Contact::fields( );
+        foreach ($contactFields as $field) {
+          if ($field['export']) {
+            $values[$field['name']] = $contact->$field['name'];
+          }
+        }        
+        
+        // Address tokens
+        // See CRM/Core/DAO/Address.PHP for field definitions
+        // Only first or primary address is returned
+        if (isset($contact->address)) {
+          foreach ($contact->address as $caddr) {
+            if ($caddr->is_primary)
+            {
+              $address = $caddr;
+              break;                  
+            }
+          }
+          
+          if (isset($address)) {
+            // figure out which fields to return
+            $addressFields =& CRM_Core_DAO_Address::fields( );        
+            foreach ($addressFields as $field) {
+              if ($field['export']) {
+                $values['address_'. $field['name']] = $address->$field['name'];
+              }
+            }
+          }
+        }
+        
+        // Phone tokens
+        // See CRM/Core/DAO/Phone.PHP for field definitions
+        // find the first or primary phone
+        if (isset($contact->phone)) {
+          foreach ($contact->phone as $cphone) {
+            if ($cphone->is_primary) {
+              $phone = $cphone;
+              break;                  
+            }
+          }
+          
+         // set return value
+          if (isset($phone)) {
+            // figure out which fields to return
+            $phoneFields =& CRM_Core_DAO_Phone::fields( );            
+            foreach ($phoneFields as $field) {
+              if ($field['export']) {
+                $values['phone_'. $field['name']] = $phone->$field['name'];
+              }
+            }
+          }
+        }
+        
+        // Email tokens
+        // See CRM/Core/DAO/Email.PHP for field definitions        
+        // find first or primary email
+        if (isset($contact->email)) {
+          foreach ($contact->email as $cemail) {
+            if ($cemail->is_primary)
+            {
+              $email = $cemail;
+              break;                  
+            }
+          }
+         // set return value
+          if (isset($email)) {            
+            // figure out which fields to return
+            $emailFields =& CRM_Core_DAO_Email::fields( );
+            foreach ($emailFields as $field) {
+              if ($field['export']) {
+                $values['email_'. $field['name']] = $email->$field['name'];
+              }
+            }
+          }          
+        }
+        
+      }
+      // TODO add more...      
+      break;      
+  }
+  
+  // TODO remove all this code when and if CiviCRM fixes bugs where NULL values are set to "null"
+  // see http://issues.civicrm.org/jira/browse/CRM-7944
+  foreach (array_keys($values) as $key){
+    if ($values[$key] == "null"){
+      $values[$key] = NULL;
+    }
+  }
+  
+  return $values;
+}
+
+    
