@@ -1,3 +1,4 @@
+# $Id: robots.txt,v 1.9.2.1 2008/12/10 20:12:19 goba Exp $
 #
 # robots.txt
 #
@@ -17,20 +18,26 @@
 # http://www.sxw.org.uk/computing/robots/check.html
 
 User-agent: *
-Crawl-delay: 10
 # Directories
+Disallow: /*
 Disallow: /includes/
 Disallow: /misc/
 Disallow: /modules/
 Disallow: /profiles/
 Disallow: /scripts/
+Disallow: /sites/
 Disallow: /themes/
+Disallow: /category/
+Disallow: /it/category/
+Disallow: /es/category/
+Disallow: /ko/category/
+Disallow: /pt-br/category/
 # Files
+Disallow: /boost_stats.php
 Disallow: /CHANGELOG.txt
 Disallow: /cron.php
 Disallow: /INSTALL.mysql.txt
 Disallow: /INSTALL.pgsql.txt
-Disallow: /INSTALL.sqlite.txt
 Disallow: /install.php
 Disallow: /INSTALL.txt
 Disallow: /LICENSE.txt
@@ -41,20 +48,53 @@ Disallow: /xmlrpc.php
 # Paths (clean URLs)
 Disallow: /admin/
 Disallow: /comment/reply/
-Disallow: /filter/tips/
+Disallow: /contact/
+Disallow: /logout/
 Disallow: /node/add/
 Disallow: /search/
 Disallow: /user/register/
 Disallow: /user/password/
 Disallow: /user/login/
-Disallow: /user/logout/
+Disallow: /print/
+
 # Paths (no clean URLs)
 Disallow: /?q=admin/
 Disallow: /?q=comment/reply/
-Disallow: /?q=filter/tips/
+Disallow: /?q=contact/
+Disallow: /?q=logout/
 Disallow: /?q=node/add/
 Disallow: /?q=search/
 Disallow: /?q=user/password/
 Disallow: /?q=user/register/
 Disallow: /?q=user/login/
-Disallow: /?q=user/logout/
+
+Disallow: /civicrm?reset=1
+Disallow: /*civicrm
+Disallow: /civicrm/*
+
+Disallow: /*webform-results
+Disallow: /*webform
+
+Disallow: /boost_stats.php
+
+Disallow: /*webform-results/
+Disallow: /*webform/
+Disallow: /*edit/
+Disallow: /*edit
+Disallow: /*configure/
+Disallow: /*configure
+Disallow: /*webfm_send/
+Disallow: /*webfm_send
+Disallow: /*webfm
+Disallow: /*webfm/
+
+# Sitemaps
+Sitemap: http://www.ulearn.ie/sitemap.xml
+Sitemap: http://www.ulearn.ie/?q=sitemap.xml
+
+
+
+
+
+
+
