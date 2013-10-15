@@ -1,0 +1,54 @@
+diff --git a/date_api/date_api_sql.inc b/date_api/date_api_sql.inc
+index a2adc65..22cd0da 100644
+--- a/date_api/date_api_sql.inc
++++ b/date_api/date_api_sql.inc
+@@ -896,30 +896,30 @@ class date_sql_handler {
+     }
+     $formats = array('display', 'sql');
+     // Start with the site long date format and add seconds to it.
+-    $long = str_replace(':i', ':i:s', variable_get('date_format_long', 'l, F j, Y - H:i'));
++    $short = str_replace(':i', ':i:s', variable_get('date_format_short', 'l, F j, Y - H:i'));
+     switch ($granularity) {
+       case 'year':
+         $formats['display'] = 'Y';
+         $formats['sql'] = 'Y';
+         break;
+       case 'month':
+-        $formats['display'] = date_limit_format($long, array('year', 'month'));
++        $formats['display'] = date_limit_format($short, array('year', 'month'));
+         $formats['sql'] = 'Y-m';
+         break;
+       case 'day':
+-        $formats['display'] = date_limit_format($long, array('year', 'month', 'day'));
++        $formats['display'] = date_limit_format($short, array('year', 'month', 'day'));
+         $formats['sql'] = 'Y-m-d';
+         break;
+       case 'hour':
+-        $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour'));
++        $formats['display'] = date_limit_format($short, array('year', 'month', 'day', 'hour'));
+         $formats['sql'] = 'Y-m-d\TH';
+         break;
+       case 'minute':
+-        $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour', 'minute'));
++        $formats['display'] = date_limit_format($short, array('year', 'month', 'day', 'hour', 'minute'));
+         $formats['sql'] = 'Y-m-d\TH:i';
+         break;
+       case 'second':
+-        $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour', 'minute', 'second'));
++        $formats['display'] = date_limit_format($short, array('year', 'month', 'day', 'hour', 'minute', 'second'));
+         $formats['sql'] = 'Y-m-d\TH:i:s';
+         break;
+       case 'week':
+diff --git a/date_views/includes/date_views_filter_handler_simple.inc b/date_views/includes/date_views_filter_handler_simple.inc
+index 8a46253..24cd634 100644
+--- a/date_views/includes/date_views_filter_handler_simple.inc
++++ b/date_views/includes/date_views_filter_handler_simple.inc
+@@ -316,7 +316,7 @@ class date_views_filter_handler_simple extends views_handler_filter_date {
+       $type = 'date_text';
+     }
+ 
+-    $format = $this->date_handler->views_formats($this->options['granularity'], 'sql');
++    $format = $this->date_handler->views_formats($this->options['granularity'], 'display');
+     $granularity = array_keys($this->date_handler->date_parts($this->options['granularity']));
+     $relative_value = ($prefix == 'max' ? $this->options['default_to_date'] : $this->options['default_date']);
+ 
