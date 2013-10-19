@@ -1,6 +1,12 @@
 
-/* ---------- Overall Specifications ---------- */
+/* ---------- NEIL'S CUSTOM CHANGES ---------- */
 
+
+body.front h1#page-title{
+display:none;
+}
+
+/* ---------- Overall Specifications ---------- */
 body {
   line-height: 1.5;
   font-size: 87.5%;
