@@ -901,3 +901,296 @@ Oct 15 11:02:02  [info] $backTrace = /home/partner/public_html/sites/all/modules
 /home/partner/public_html/includes/menu.inc, call_user_func_array, 517
 /home/partner/public_html/index.php, menu_execute_active_handler, 21
 
+Oct 17 12:03:02  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 12:03:03  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 12:03:08  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 12:03:08  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 12:04:12  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 12:04:12  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 12:38:03  [info] $Fatal Error Details = Array
+(
+    [message] => in progress is not of the type Integer
+    [code] => 
+)
+
+
+Oct 17 12:38:03  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 183
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, escape, 4359
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, buildClause, 373
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, whereClauseSingle, 210
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Component.php, where, 237
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, alterQuery, 1535
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, whereClause, 458
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, initialize, 419
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Selector.php, __construct, 215
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php(924) : eval()'d code, __construct, 9
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php, eval, 924
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search/Builder.php, postProcess, 381
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 246
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Refresh.php, mainProcess, 75
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 228
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 12:38:55  [info] $Fatal Error Details = Array
+(
+    [message] => pending is not of the type Integer
+    [code] => 
+)
+
+
+Oct 17 12:38:55  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 183
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, escape, 4359
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, buildClause, 373
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, whereClauseSingle, 210
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Component.php, where, 237
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, alterQuery, 1535
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, whereClause, 458
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, initialize, 419
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Selector.php, __construct, 215
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php(924) : eval()'d code, __construct, 9
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php, eval, 924
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search/Builder.php, postProcess, 381
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 246
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Refresh.php, mainProcess, 75
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 228
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 12:39:07  [info] $Fatal Error Details = Array
+(
+    [message] => pending is not of the type Integer
+    [code] => 
+)
+
+
+Oct 17 12:39:07  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 183
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, escape, 4359
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, buildClause, 373
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contribute/BAO/Query.php, whereClauseSingle, 210
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Component.php, where, 237
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, alterQuery, 1535
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, whereClause, 458
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Query.php, initialize, 419
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Selector.php, __construct, 215
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php(924) : eval()'d code, __construct, 9
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search.php, eval, 924
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Search/Builder.php, postProcess, 381
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 246
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Refresh.php, mainProcess, 75
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 228
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 14:58:10  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 14:58:10  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 14:58:19  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 14:58:19  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 14:58:40  [info] $Fatal Error Details = Array
+(
+    [message] => We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.<br /><br />Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.<br /><br />Error type: Could not find a valid session key.
+    [code] => 
+)
+
+
+Oct 17 14:58:40  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, fatal, 251
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, key, 160
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Controller/Search.php, __construct, 54
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php(223) : eval()'d code, __construct, 1
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, eval, 223
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 17 16:41:27  [info] Beginning processQueue run: 0, 0
+
+Oct 17 16:41:29  [info] Ending processQueue run
+
+Oct 18 13:44:40  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 18 13:44:40  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 106
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php, retrieve, 151
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 338
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 121
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 115
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 193
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 18 13:44:48  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 18 13:44:48  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 106
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php, retrieve, 151
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 338
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 93
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 115
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 193
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 18 13:44:54  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 18 13:44:54  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 106
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php, retrieve, 151
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 338
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 121
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 115
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 193
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 18 13:45:04  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 18 13:45:04  [info] $backTrace = /home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 106
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php, retrieve, 151
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 338
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 121
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/partner/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 115
+/home/partner/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 193
+/home/partner/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/partner/public_html/includes/menu.inc, call_user_func_array, 517
+/home/partner/public_html/index.php, menu_execute_active_handler, 21
+

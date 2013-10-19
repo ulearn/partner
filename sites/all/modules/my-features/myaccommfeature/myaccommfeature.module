@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the MyAccommFeature feature.
+ */
+
+include_once 'myaccommfeature.features.inc';
