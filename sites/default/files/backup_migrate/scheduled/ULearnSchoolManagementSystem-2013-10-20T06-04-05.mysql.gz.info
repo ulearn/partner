@@ -1,0 +1,8 @@
+filename = "ULearnSchoolManagementSystem-2013-10-20T06-04-05"
+description = ""
+datestamp = "1382245461"
+generator = "Backup and Migrate (http://drupal.org/project/backup_migrate)"
+generatorversion = "7.x-2.x"
+sites[0][version] = "7.23"
+sites[0][name] = "ULearn School Management System"
+sites[0][url] = "http://class.ulearn.ie/"

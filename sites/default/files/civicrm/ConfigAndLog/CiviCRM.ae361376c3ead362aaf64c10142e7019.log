@@ -1,0 +1,173 @@
+Oct 19 22:06:46  [info] $Fatal Error Details = Array
+(
+    [message] => Extension file /home/class/public_html/sites/default/files/civicrm/extensions/sync.googleapps-1.0/info.xml does not exist. The download may have failed.
+    [code] => 
+)
+
+
+Oct 19 22:06:46  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Extensions/Extension.php, fatal, 178
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Extensions/Extension.php, _parseXMLFile, 130
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Extensions.php, readXMLInfo, 365
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Extensions.php, _discoverInstalled, 320
+/home/class/public_html/sites/all/modules/civicrm/CRM/Admin/Page/Extensions.php, getExtensions, 62
+/home/class/public_html/sites/all/modules/civicrm/CRM/Admin/Page/Extensions.php, preProcess, 132
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 228
+/home/class/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:36:40  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:36:40  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 452
+/home/class/public_html/includes/form.inc, drupal_rebuild_form, 931
+/home/class/public_html/includes/ajax.inc, drupal_process_form, 370
+, ajax_form_callback, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:39:46  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:39:46  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:39:47  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:39:47  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:39:52  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:39:52  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:39:55  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:39:55  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:40:10  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:40:10  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 20 00:40:11  [info] $Fatal Error Details = Array
+(
+    [message] => Unable to load configuration file for the referenced case type: 'Accommodation' <a href="http://book.civicrm.org/user/case-management/setup"  target="_blank" title="Opens documentation in a new window.">(learn more...)</a>.
+    [code] => 
+)
+
+
+Oct 20 00:40:11  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Case/XMLProcessor/Process.php, fatal, 63
+/home/class/public_html/sites/all/modules/webform_civicrm/webform_civicrm_admin.inc, get, 309
+, wf_crm_configure_form, 
+/home/class/public_html/includes/form.inc, call_user_func_array, 799
+/home/class/public_html/includes/form.inc, drupal_retrieve_form, 339
+/home/class/public_html/includes/form.inc, drupal_build_form, 131
+, drupal_get_form, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
+Oct 21 17:52:43  [info] $Fatal Error Details = Array
+(
+    [message] =>  is not of the type Integer
+    [code] => 
+)
+
+
+Oct 21 17:52:43  [info] $backTrace = /home/class/public_html/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 300
+/home/class/public_html/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 183
+/home/class/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Relationship.php, escape, 651
+/home/class/public_html/sites/all/modules/civicrm/CRM/Contact/BAO/Relationship.php, checkDuplicateRelationship, 111
+/home/class/public_html/sites/all/modules/civicrm/CRM/Contact/Form/Relationship.php, create, 561
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 246
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 151
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 128
+/home/class/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/class/public_html/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 289
+/home/class/public_html/sites/all/modules/civicrm/CRM/Contact/Page/View/Relationship.php, run, 212
+/home/class/public_html/sites/all/modules/civicrm/CRM/Contact/Page/View/Relationship.php, edit, 248
+/home/class/public_html/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 228
+/home/class/public_html/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 500
+, civicrm_invoke, 
+/home/class/public_html/includes/menu.inc, call_user_func_array, 517
+/home/class/public_html/index.php, menu_execute_active_handler, 21
+
