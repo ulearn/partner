@@ -1,0 +1,224 @@
+<?php
+
+function addsmartgroup_civicrm_post( $op, $objectName, $objectId, &$objectRef )
+{
+	/*echo $op.'===='.$objectName.'===='.$objectId;
+	echo '<pre>';
+	print_r($objectRef);
+	die; */ 
+	
+	
+	//GroupContact
+	if($objectName == 'GroupContact')
+	{
+		
+		$Checkcontact = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+					  ->fields('civicrm_smartgroup_contact', array('id'))
+					  ->condition('group_id',$objectId,'=')
+					  ->condition('contact_id',$objectRef[0],'=');
+		$contactresult = $Checkcontact->execute()->fetchAll();
+	
+		if(empty($contactresult))
+		{
+			/*$strInsert = db_insert('civicrm_smartgroup_contact')
+						  ->fields(array(
+							'group_id' => $objectId,
+							'contact_id' => $objectRef[0],
+						  ))
+						  ->execute();*/
+						  
+						  db_set_active('civi01');
+						$resultInsert = db_query('INSERT INTO {smartgroup_contact} (group_id,contact_id) VALUES (:gid,:cid)', array(':gid' => $objectId, ':cid' => $objectRef[0]));
+						db_set_active(); 	
+		
+		}
+		
+		if($op == 'create' || $op == 'edit')
+		{
+			$Checkquery = db_select('civicrm_group', 'civicrm_group')
+								  ->fields('civicrm_group', array('where_clause'))
+								  ->condition('id',$objectId,'=');
+						 
+			$Checkresults = $Checkquery->execute()->fetchAll();
+			
+			foreach($Checkresults as $res)
+			{
+				if(preg_match('/civicrm_group_contact_cache/',$res->where_clause))
+				{
+					
+					$getquery = db_select('civicrm_group_contact', 'civicrm_group_contact')
+								  ->fields('civicrm_group_contact', array('contact_id'))
+								  ->condition('group_id',$objectId,'=');
+							 
+					$getresults = $getquery->execute()->fetchAll();
+					
+					
+					foreach($getresults as $gres)	
+					{
+						$Checkcontact = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+									  ->fields('civicrm_smartgroup_contact', array('id'))
+									  ->condition('group_id',$objectId,'=')
+									  ->condition('contact_id',$gres->contact_id,'=');
+						$contactresult = $Checkcontact->execute()->fetchAll();
+					
+						if(empty($contactresult))
+						{
+							/*$strInsert = db_insert('civicrm_smartgroup_contact')
+										  ->fields(array(
+											'group_id' => $objectId,
+											'contact_id' => $gres->contact_id,
+										  ))
+										  ->execute();*/
+										  
+						db_set_active('civi01');
+						$resultInsert = db_query('INSERT INTO {smartgroup_contact} (group_id,contact_id) VALUES (:gid,:cid)', array(':gid' => $objectId, ':cid' => $gres->contact_id));
+						db_set_active(); 
+						
+						}
+					}
+				}
+			}
+		}
+	}
+	if($objectName == 'Group')
+	{
+		if($op	==	'create' || $op == 'edit')
+		{
+			$arrWhere	=	unserialize($objectRef->where_tables);
+			if(isset($arrWhere['`civicrm_group_contact_cache_'.$objectId.'`']))
+			{
+			  $new_count_query = db_select('civicrm_group_contact_cache', 'civicrm_group_contact_cache')
+				  ->fields('civicrm_group_contact_cache', array('contact_id'))
+				  ->condition('group_id',$objectId,'=');
+				$results = $new_count_query->execute()->fetchAll();
+				
+				
+				foreach($results as $resultCon)
+				{
+					$Checkquery = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+									  ->fields('civicrm_smartgroup_contact', array('id'))
+									  ->condition('group_id',$objectId,'=')
+									  ->condition('contact_id',$resultCon->contact_id,'=');
+					$Checkresults = $Checkquery->execute()->fetchAll();
+				
+					/*print_r($Checkresults);
+					echo $resultCon->contact_id.'===='.$objectId;*/
+					
+					if(empty($Checkresults))
+					{
+						
+						db_set_active('civi01');
+						$resultInsert = db_query('INSERT INTO {smartgroup_contact} (group_id,contact_id) VALUES (:gid,:cid)', array(':gid' => $objectId, ':cid' => $resultCon->contact_id));
+						db_set_active(); 	
+						
+					}
+					
+				}
+				
+			}
+		}
+		
+	}
+}
+
+
+function addsmartgroup_civicrm_pre( $op, $objectName, $objectId, &$objectRef )
+{
+	/*echo $op.'===='.$objectName.'===='.$objectId;
+	echo '<pre>';
+	print_r($objectRef);
+	die;*/
+	
+	$arrObject = array('Individual','Student','Household','Parent','Staff','Team','sponsor');
+	
+	if ($op	==	'delete')
+	{
+		
+		if(in_array($objectName,$arrObject))
+		{
+			$Checkquery = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+							  ->fields('civicrm_smartgroup_contact', array('id'))
+							  ->condition('contact_id',$objectId,'=');
+						 
+			$Checkresults = $Checkquery->execute()->fetchAll();
+			if(!empty($Checkresults))
+			{
+				db_set_active('civi01');
+				$num_deleted = db_delete('smartgroup_contact')
+					->condition('contact_id', $objectId)
+					->execute();
+				db_set_active(); 
+			}
+		}
+		if($objectName == 'Group')
+		{
+			$Checkquery = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+							  ->fields('civicrm_smartgroup_contact', array('id'))
+							  ->condition('group_id',$objectId,'=');
+						 
+			$Checkresults = $Checkquery->execute()->fetchAll();
+			if(!empty($Checkresults))
+			{
+				db_set_active('civi01');
+				$num_deleted = db_delete('smartgroup_contact')
+					->condition('group_id', $objectId)
+					->execute();
+				db_set_active(); 
+			}
+		}
+		
+	}
+	if($op	==	'restore')
+	{
+		if(in_array($objectName,$arrObject))
+		{
+			$getquery = db_select('civicrm_group_contact', 'civicrm_group_contact')
+						  ->fields('civicrm_group_contact', array('group_id'))
+						  ->condition('contact_id',$objectId,'=');
+					 
+			$getresults = $getquery->execute()->fetchAll();
+			foreach($getresults as $gres)	
+			{
+				$Checkquery = db_select('civicrm_group', 'civicrm_group')
+								  ->fields('civicrm_group', array('where_clause'))
+								  ->condition('id',$gres->group_id,'=');
+							 
+				$Checkresults = $Checkquery->execute()->fetchAll();
+				foreach($Checkresults as $res)
+				{
+					if(preg_match('/civicrm_group_contact_cache/',$res->where_clause))
+					{
+						
+						$Checkquery1 = db_select('civicrm_smartgroup_contact', 'civicrm_smartgroup_contact')
+										  ->fields('civicrm_smartgroup_contact', array('id'))
+										  ->condition('group_id',$gres->group_id,'=')
+										  ->condition('contact_id',$objectId,'=');
+						$Checkresults1 = $Checkquery1->execute()->fetchAll();
+					
+						if(empty($Checkresults1))
+						{
+							/*$strInsert = db_insert('civicrm_smartgroup_contact')
+								  ->fields(array(
+									'group_id' => $gres->group_id,
+									'contact_id' => $objectId,
+								  ))
+								  ->execute();*/
+							db_set_active('civi01');
+							$resultInsert = db_query('INSERT INTO {smartgroup_contact} (group_id,contact_id) VALUES (:gid,:cid)', array(':gid' => $gres->group_id, ':cid' => $objectId));
+							db_set_active(); 		  
+								 
+						} 
+					}
+				}
+			}
+		}
+	}
+}
+
+/*function hook_civicrm_postProcess( $formName, &$form )
+{ 
+	echo $formName;
+	echo '<pre>';
+	print_r($form);
+	die;
+}*/

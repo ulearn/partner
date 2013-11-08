@@ -117,6 +117,10 @@ Class CRM_Core_Form_Date {
       'ending.quarter' => ts('From 3 Months Ago'),
       'ending.month' => ts('From 1 Month Ago'),
       'ending.week' => ts('From 1 Week Ago'),
+	    'next.week' => ts('Next Week'),
+            'next_2.week' => ts('Two Weeks From Now'),
+            'next_3.week' => ts('Three Weeks From Now'),
+            'next_4.week' => ts('Four Weeks From Now')
     );
     if ($addReportFilters) {
       $selector += CRM_Report_Form::getOperationPair(CRM_Report_FORM::OP_DATE);

@@ -1,0 +1,8 @@
+name = Civicrm Smartgroup
+description = Civicrm Smartgroup View
+dependencies[] = civicrm
+package = CiviCRM
+core = 7.x
+
+files[] = civicrm_smartgroup_handler_filter.inc
+files[] = civicrm_smartgroup.views.inc

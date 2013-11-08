@@ -1,0 +1,7 @@
+name = Add Smartgroup
+description = Add Smartgroup detail in custom tabel
+dependencies[] = civicrm
+package = CiviCRM
+core = 7.x
+
+files[] = addsmartgroup.install
