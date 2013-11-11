@@ -1,7 +1,7 @@
 # Ignore configuration files that may contain sensitive information.
-sites/*/settings*.php
-sites/*/civicrm.settings.php
-sites/*/files/civicrm/templates_c/*
+sites/default/settings*.php
+sites/default/civicrm.settings.php
+sites/default/files/civicrm/templates_c/*
 
 # Ignore paths that contain user-generated content.
 sites/default/files/css
