@@ -1,8 +1,0 @@
-filename = "partner.ulearn.ie-2013-08-23T06-02-34"
-description = ""
-datestamp = "1377234156"
-generator = "Backup and Migrate (http://drupal.org/project/backup_migrate)"
-generatorversion = "7.x-2.x"
-sites[0][version] = "7.23"
-sites[0][name] = "partner.ulearn.ie"
-sites[0][url] = "http://partner.ulearn.ie/"
