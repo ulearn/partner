@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -47,6 +47,11 @@
 class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
+   * @var array ($cacheKey => $cacheValue)
+   */
+  static $_cache = NULL;
+
+  /**
    * Retrieve an item from the DB cache
    *
    * @param string $group (required) The group name of the item
@@ -57,20 +62,72 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static
-  function &getItem($group, $path, $componentID = NULL) {
-    $dao = new CRM_Core_DAO_Cache();
-
-    $dao->group_name   = $group;
-    $dao->path         = $path;
-    $dao->component_id = $componentID;
-
-    $data = NULL;
-    if ($dao->find(TRUE)) {
-      $data = unserialize($dao->data);
+  static function &getItem($group, $path, $componentID = NULL) {
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
     }
-    $dao->free();
-    return $data;
+
+    $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
+    if (!array_key_exists($argString, self::$_cache)) {
+      $cache = CRM_Utils_Cache::singleton();
+      self::$_cache[$argString] = $cache->get($argString);
+      if (!self::$_cache[$argString]) {
+        $dao = new CRM_Core_DAO_Cache();
+
+        $dao->group_name   = $group;
+        $dao->path         = $path;
+        $dao->component_id = $componentID;
+
+        $data = NULL;
+        if ($dao->find(TRUE)) {
+          $data = unserialize($dao->data);
+        }
+        $dao->free();
+        self::$_cache[$argString] = $data;
+        $cache->set($argString, self::$_cache[$argString]);
+      }
+    }
+    return self::$_cache[$argString];
+  }
+
+  /**
+   * Retrieve all items in a group
+   *
+   * @param string $group (required) The group name of the item
+   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   *
+   * @return object The data if present in cache, else null
+   * @static
+   * @access public
+   */
+  static function &getItems($group, $componentID = NULL) {
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
+    }
+
+    $argString = "CRM_CT_CI_{$group}_{$componentID}";
+    if (!array_key_exists($argString, self::$_cache)) {
+      $cache = CRM_Utils_Cache::singleton();
+      self::$_cache[$argString] = $cache->get($argString);
+      if (!self::$_cache[$argString]) {
+        $dao = new CRM_Core_DAO_Cache();
+
+        $dao->group_name   = $group;
+        $dao->component_id = $componentID;
+        $dao->find();
+
+        $result = array(); // array($path => $data)
+        while ($dao->fetch()) {
+          $result[$dao->path] = unserialize($dao->data);
+        }
+        $dao->free();
+
+        self::$_cache[$argString] = $result;
+        $cache->set($argString, self::$_cache[$argString]);
+      }
+    }
+
+    return self::$_cache[$argString];
   }
 
   /**
@@ -85,23 +142,46 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static
-  function setItem(&$data,
-    $group, $path, $componentID = NULL
-  ) {
+  static function setItem(&$data, $group, $path, $componentID = NULL) {
+    if (self::$_cache === NULL) {
+      self::$_cache = array();
+    }
+
     $dao = new CRM_Core_DAO_Cache();
 
     $dao->group_name   = $group;
     $dao->path         = $path;
     $dao->component_id = $componentID;
 
+    // get a lock so that multiple ajax requests on the same page
+    // dont trample on each other
+    // CRM-11234
+    $lockName = "civicrm.cache.{$group}_{$path}._{$componentID}";
+    $lock = new CRM_Core_Lock($lockName);
+    if (!$lock->isAcquired()) {
+      CRM_Core_Error::fatal();
+    }
+
     $dao->find(TRUE);
     $dao->data = serialize($data);
     $dao->created_date = date('YmdHis');
-
     $dao->save();
 
+    $lock->release();
+
     $dao->free();
+
+    // cache coherency - refresh or remove dependent caches
+
+    $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
+    $cache = CRM_Utils_Cache::singleton();
+    $data = unserialize($dao->data);
+    self::$_cache[$argString] = $data;
+    $cache->set($argString, $data);
+
+    $argString = "CRM_CT_CI_{$group}_{$componentID}";
+    unset(self::$_cache[$argString]);
+    $cache->delete($argString);
   }
 
   /**
@@ -116,8 +196,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access public
    */
-  static
-  function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
+  static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
     $dao = new CRM_Core_DAO_Cache();
 
     if (!empty($group)) {
@@ -159,38 +238,31 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @static
    * @access private
    */
-  static
-  function storeSessionToCache($names,
-    $resetSession = TRUE
-  ) {
+  static function storeSessionToCache($names, $resetSession = TRUE) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
+        $value = null;
         if (!empty($_SESSION[$sessionName[0]][$sessionName[1]])) {
-          self::setItem($_SESSION[$sessionName[0]][$sessionName[1]],
-            'CiviCRM Session',
-            "{$sessionName[0]}_{$sessionName[1]}"
-          );
-          // $_SESSION[$sessionName[0]][$sessionName[1]] );
+          $value = $_SESSION[$sessionName[0]][$sessionName[1]];
+        }
+        self::setItem($value, 'CiviCRM Session', "{$sessionName[0]}_{$sessionName[1]}");
           if ($resetSession) {
             $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
             unset($_SESSION[$sessionName[0]][$sessionName[1]]);
           }
         }
-      }
       else {
+        $value = null;
         if (!empty($_SESSION[$sessionName])) {
-          self::setItem($_SESSION[$sessionName],
-            'CiviCRM Session',
-            $sessionName
-          );
-          // $_SESSION[$sessionName] );
+          $value = $_SESSION[$sessionName];
+        }
+        self::setItem($value, 'CiviCRM Session', $sessionName);
           if ($resetSession) {
             $_SESSION[$sessionName] = NULL;
             unset($_SESSION[$sessionName]);
           }
         }
       }
-    }
 
     self::cleanup();
   }
@@ -206,8 +278,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
      * @access private
      */
 
-  static
-  function restoreSessionFromCache($names) {
+  static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
         $value = self::getItem('CiviCRM Session',
@@ -313,7 +384,7 @@ WHERE       group_name = 'CiviCRM Session'
 AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
 ";
       CRM_Core_DAO::executeQuery($sql);
+    }
   }
-}
 }
 

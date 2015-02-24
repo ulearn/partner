@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,15 +24,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
-
-/**
- *
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
- * $Id$
- *
- */
 class CRM_Core_ClassLoader {
 
   /**
@@ -71,13 +62,40 @@ class CRM_Core_ClassLoader {
       return;
     }
 
+    // we do this to prevent a autoloader errors with joomla / 3rd party packages
+    // use absolute path since we dont know the content of include_path as yet
+    // CRM-11304
+
+    // since HTML Purifier could potentially be loaded / used by other modules / components
+    // lets check it its already loaded
+    // we also check if the bootstrap file exists since during install of a drupal distro profile
+    // the files might not exists, in which case we skip loading the file
+    // if you change the below, please test on Joomla and also PCP pages
+    $includeHTMLPurifier = TRUE;
+    $htmlPurifierPath = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
+    if (
+      class_exists('HTMLPurifier_Bootstrap') ||
+      !file_exists($htmlPurifierPath)
+    ) {
+      $includeHTMLPurifier = FALSE;
+    }
+    else {
+      require_once $htmlPurifierPath;
+    }
+
     if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
       spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
+      if ($includeHTMLPurifier) {
+        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
+      }
     }
     else {
       // http://www.php.net/manual/de/function.spl-autoload-register.php#107362
       // "when specifying the third parameter (prepend), the function will fail badly in PHP 5.2"
       spl_autoload_register(array($this, 'loadClass'), TRUE);
+      if ($includeHTMLPurifier) {
+        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE);
+      }
     }
 
     $this->_registered = TRUE;

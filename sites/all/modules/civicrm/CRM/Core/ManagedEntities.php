@@ -23,6 +23,9 @@ class CRM_Core_ManagedEntities {
     static $singleton;
     if ($fresh || !$singleton) {
       $declarations = array();
+      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+        $declarations = array_merge($declarations, $component->getManagedEntities());
+      }
       CRM_Utils_Hook::managed($declarations);
       $singleton = new CRM_Core_ManagedEntities(CRM_Core_Module::getAll(), $declarations);
     }
@@ -46,15 +49,16 @@ class CRM_Core_ManagedEntities {
     $dao->module = $moduleName;
     $dao->name = $name;
     if ($dao->find(TRUE)) {
-      $result = civicrm_api($dao->entity_type, 'getsingle', array(
-        'version' => 3,
+      $params = array(
         'id' => $dao->entity_id,
-      ));
-      if ($result['is_error']) {
-        throw new Exception('API error: ' . $result['error_message']);
-      } else {
-        return $result;
+      );
+      try {
+        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
+      catch (Exception $e) {
+        $this->onApiError($params, $result);
+      }
+      return $result;
     } else {
       return NULL;
     }
@@ -75,7 +79,7 @@ class CRM_Core_ManagedEntities {
     // an active module -- because we got it from a hook!
 
     // index by moduleName,name
-    $decls = self::createDeclarationIndex($this->declarations);
+    $decls = self::createDeclarationIndex($this->moduleIndex, $this->declarations);
     foreach ($decls as $moduleName => $todos) {
       if (isset($this->moduleIndex[TRUE][$moduleName])) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
@@ -98,24 +102,25 @@ class CRM_Core_ManagedEntities {
     $dao->module = $module->name;
     $dao->find();
     while ($dao->fetch()) {
-      if ($todos[$dao->name]) {
+      if (isset($todos[$dao->name]) && $todos[$dao->name]) {
         // update existing entity; remove from $todos
         $defaults = array('id' => $dao->entity_id, 'is_active' => 1); // FIXME: test whether is_active is valid
         $params = array_merge($defaults, $todos[$dao->name]['params']);
         $result = civicrm_api($dao->entity_type, 'create', $params);
         if ($result['is_error']) {
-          throw new Exception($result['error_message']);
+          $this->onApiError($params, $result);
         }
 
         unset($todos[$dao->name]);
       } else {
         // remove stale entity; not in $todos
-        $result = civicrm_api($dao->entity_type, 'create', array(
+        $params = array(
           'version' => 3,
           'id' => $dao->entity_id,
-        ));
+        );
+        $result = civicrm_api($dao->entity_type, 'delete', $params);
         if ($result['is_error']) {
-          throw new Exception('API error: ' . $result['error_message']);
+          $this->onApiError($params, $result);
         }
 
         CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
@@ -128,7 +133,7 @@ class CRM_Core_ManagedEntities {
     foreach ($todos as $name => $todo) {
       $result = civicrm_api($todo['entity'], 'create', $todo['params']);
       if ($result['is_error']) {
-        throw new Exception('API error: ' . $result['error_message']);
+        $this->onApiError($todo['params'], $result);
       }
 
       $dao = new CRM_Core_DAO_Managed();
@@ -153,13 +158,14 @@ class CRM_Core_ManagedEntities {
       // FIXME: if ($dao->entity_type supports is_active) {
       if (TRUE) {
         // FIXME cascading for payproc types?
-        $result = civicrm_api($dao->entity_type, 'create', array(
+        $params = array(
           'version' => 3,
           'id' => $dao->entity_id,
           'is_active' => 0,
-        ));
+        );
+        $result = civicrm_api($dao->entity_type, 'create', $params);
         if ($result['is_error']) {
-          throw new Exception('API error: ' . $result['error_message']);
+          $this->onApiError($params, $result);
         }
       }
     }
@@ -182,12 +188,13 @@ class CRM_Core_ManagedEntities {
     }
     $dao->find();
     while ($dao->fetch()) {
-      $result = civicrm_api($dao->entity_type, 'delete', array(
+      $params = array(
         'version' => 3,
         'id' => $dao->entity_id,
-      ));
+      );
+      $result = civicrm_api($dao->entity_type, 'delete', $params);
       if ($result['is_error']) {
-        throw new Exception('API error: ' . $result['error_message']);
+        $this->onApiError($params, $result);
       }
 
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
@@ -210,8 +217,17 @@ class CRM_Core_ManagedEntities {
   /**
    * @return array indexed by module,name
    */
-  protected static function createDeclarationIndex($declarations) {
+  protected static function createDeclarationIndex($moduleIndex, $declarations) {
     $result = array();
+    if (!isset($moduleIndex[TRUE])) {
+      return $result;
+    }
+    foreach ($moduleIndex[TRUE] as $moduleName => $module) {
+      if ($module->is_active) {
+        // need an empty array() for all active modules, even if there are no current $declarations
+        $result[$moduleName] = array();
+      }
+    }
     foreach ($declarations as $declaration) {
       $result[$declaration['module']][$declaration['name']] = $declaration;
     }
@@ -233,6 +249,7 @@ class CRM_Core_ManagedEntities {
     }
     return FALSE;
   }
+
   protected static function cleanDeclarations($declarations) {
     foreach ($declarations as $name => &$declare) {
       if (!array_key_exists('name', $declare)) {
@@ -240,6 +257,14 @@ class CRM_Core_ManagedEntities {
       }
     }
     return $declarations;
+  }
+
+  protected function onApiError($params, $result) {
+    CRM_Core_Error::debug_var('ManagedEntities_failed', array(
+      'params' => $params,
+      'result' => $result,
+    ));
+    throw new Exception('API error: ' . $result['error_message']);
   }
 }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@ class CRM_Upgrade_Headless {
    *   - message: string, HTML-ish blob
    * @throws Exception
    */
-  function run() {
+  function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
@@ -50,6 +50,13 @@ class CRM_Upgrade_Headless {
       throw new Exception($error);
     }
 
+    // Disable our SQL triggers
+    CRM_Core_DAO::dropTriggers();
+
+    // CRM-11156
+    $preUpgradeMessage = NULL;
+    $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner(array(
         'title' => ts('CiviCRM Upgrade Tasks'),
@@ -57,7 +64,12 @@ class CRM_Upgrade_Headless {
       ));
     $queueResult = $queueRunner->runAll();
     if ($queueResult !== TRUE) {
-      throw new Exception('Error running queued tasks: ' . print_r($queueResult, TRUE));
+      $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);
+      CRM_Core_Error::debug_log_message($errorMessage);
+      if ($enablePrint) {
+        print($errorMessage);
+    }
+      throw $queueResult['exception']; // FIXME test
     }
 
     CRM_Upgrade_Form::doFinish();

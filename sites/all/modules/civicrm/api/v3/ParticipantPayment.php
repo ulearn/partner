@@ -1,11 +1,10 @@
 <?php
-// $Id$
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -41,7 +40,6 @@
 /**
  * Files required for this package
  */
-require_once 'CRM/Event/BAO/ParticipantPayment.php';
 
 /**
  * Create a Event Participant Payment
@@ -70,9 +68,10 @@ function civicrm_api3_participant_payment_create($params) {
 
   return civicrm_api3_create_success($payment, $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
@@ -96,5 +95,20 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
 function civicrm_api3_participant_payment_delete($params) {
   $participant = new CRM_Event_BAO_ParticipantPayment();
   return $participant->deleteParticipantPayment($params) ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting participantPayment');
+}
+
+/**
+ * Retrieve one / all contribution(s) / participant(s) linked to a
+ * contrbution.
+ *
+ * @param  array   $params  input parameters
+ *
+ * @return array  array of properties, if error an array with an error id and error message
+ *  @example ParticipantPaymentGet
+ * {@getfields ParticipantPayment_get}
+ * @access public
+ */
+function civicrm_api3_participant_payment_get($params) {
+  return _civicrm_api3_basic_get('CRM_Event_DAO_ParticipantPayment', $params);
 }
 

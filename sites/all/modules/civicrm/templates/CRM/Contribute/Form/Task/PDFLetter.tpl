@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,29 +24,25 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-block crm-contact-task-pdf-form-block">
-<h3>{ts}Create Printable Letters (PDF){/ts}</h3>
+<h3>{ts}Thank-you Letter for Contributions (PDF){/ts}</h3>
 {if $single eq false}
-    <div class="messages status">{include file="CRM/Contribute/Form/Task.tpl"}</div>
+    <div class="messages status no-popup">{include file="CRM/Contribute/Form/Task.tpl"}</div>
 {/if}
 
-{include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}
-
-<div class="crm-accordion-wrapper crm-html_email-accordion crm-accordion-open">
+<div class="crm-accordion-wrapper crm-html_email-accordion ">
   <div class="crm-accordion-header">
-    <div class="icon crm-accordion-pointer"></div>
     {$form.more_options_header.html}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
- 
     <table class="form-layout-compressed">
-      <tr><td class="label-left">{$form.receipt_update.html} {$form.receipt_update.label}</td><td></td></tr>
       <tr><td class="label-left">{$form.thankyou_update.html} {$form.thankyou_update.label}</td><td></td></tr>
+      <tr><td class="label-left">{$form.receipt_update.html} {$form.receipt_update.label}</td><td></td></tr>
       <!--tr><td class="label-left">{$form.is_group_by.label} (<a href="#" title="unselect" onclick="unselectRadio('is_group_by'); return false;" >{ts}clear{/ts}</a>)</td><td>{$form.is_group_by.html}</td></tr-->
     </table>
-
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
+{include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

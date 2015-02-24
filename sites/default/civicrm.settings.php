@@ -59,7 +59,7 @@ define( 'CIVICRM_UF'               , 'Drupal'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://class_admin:Pa22w0rd@localhost/class_drupal?new_link=true' );
+define( 'CIVICRM_UF_DSN'           , 'mysql://partner_admin:Aracna5bia@localhost/partner_drupal?new_link=true' );
 
 /**
  * CiviCRM Database Settings
@@ -82,7 +82,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://class_admin:Pa22w0rd@localhost/cla
  define( 'CIVICRM_DSN'          , 'mysql://class_admin:Pa22w0rd@localhost/class_civitemp?new_link=true' );
 
  */
- define( 'CIVICRM_DSN'          , 'mysql://ulearn_admin:Pa22w0rd@localhost/ulearn_civi?new_link=true' );
+define( 'CIVICRM_DSN'          , 'mysql://stage_admin:Aracna5bia*@localhost/stage_civikey?new_link=true' );
 
 /**
  * CiviCRM Logging Database
@@ -134,8 +134,8 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 
 global $civicrm_root;
 
-$civicrm_root = '/home/class/public_html/sites/all/modules/civicrm';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/class/public_html/sites/default/files/civicrm/templates_c/' );
+$civicrm_root = '/home/partner/public_html/sites/all/modules/civicrm';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/partner/public_html/sites/default/files/civicrm/templates_c/' );
 
 /**
  * Site URLs:
@@ -161,9 +161,10 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/class/public_html/sites/default/fi
  * Front-end site:
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/' );
  *
- */
-define( 'CIVICRM_UF_BASEURL'      , 'http://class.ulearn.ie/' );
 
+define( 'CIVICRM_UF_BASEURL'      , 'http://partner.ulearnschool.com/' );
+ */
+ 
 /*
  * If you are using any CiviCRM script in the bin directory that
  * requires authentication, then you also need to set this key.
@@ -281,5 +282,3 @@ if ($memLimit >= 0 and $memLimit < 134217728) {
     ini_set('memory_limit', '128M');
 }
 
-require_once 'CRM/Core/ClassLoader.php';
-CRM_Core_ClassLoader::singleton()->register();

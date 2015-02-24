@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,7 +60,8 @@ cj( function() {
         spinner: spinnerImage,
         select: function(event, ui) {
             // we need to change the action of parent form, so that form submits to correct page
-            var url = cj.data(ui.tab, 'load.tabs');
+            var url = ui.tab.href;
+
             {/literal}{if $config->userSystem->is_drupal}{literal}
                 var actionUrl = url.split( '?' );
                 {/literal}{if $config->cleanURL}{literal}
@@ -74,8 +75,6 @@ cj( function() {
                 var actualUrl = actionUrl[0] + '&' + actionUrl[1];
             {/literal}{/if}{literal}
 
-            cj(this).parents("form").attr("action", actualUrl );
-
             if ( !global_formNavigate ) {
               var message = '{/literal}{ts escape="js"}Are you sure you want to navigate away from this tab?{/ts}' + '\n\n' + '{ts escape="js"}You have unsaved changes.{/ts}' + '\n\n' + '{ts escape="js"}Press OK to continue, or Cancel to stay on the current tab.{/ts}{literal}';
               if ( !confirm( message ) ) {
@@ -84,11 +83,18 @@ cj( function() {
                 global_formNavigate = true;
               }
             }
+            cj(this).parents("form").attr("action", actualUrl );
+
             return true;
         },
         load: function(event, ui) {
           if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(ui.panel);
+            Drupal.attachBehaviors(ui.panel[0]);
+          }
+          cj(ui.panel).trigger('crmFormLoad');
+          // FIXME - decouple scanProfileSelectors and TabHeader
+          if (CRM.scanProfileSelectors) {
+            CRM.scanProfileSelectors();
           }
         }
     });

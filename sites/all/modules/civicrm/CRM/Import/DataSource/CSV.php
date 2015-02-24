@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  CONST NUM_ROWS_TO_INSERT = 100;
+  CONST
+    NUM_ROWS_TO_INSERT = 100;
+
   function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }
@@ -59,7 +61,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $form->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
   }
 
-  function postProcess(&$params, &$db) {
+  function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
 
     $result = self::_CsvToTable($db,
@@ -69,11 +71,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       CRM_Utils_Array::value('fieldSeparator', $params, ',')
     );
 
-    $this->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
+    $form->set('originalColHeader', CRM_Utils_Array::value('original_col_header', $result));
 
     $table = $result['import_table_name'];
-    $importJob = new CRM_Import_ImportJob($table);
-    $this->set('importTableName', $importJob->getTableName());
+    $importJob = new CRM_Contact_Import_ImportJob($table);
+    $form->set('importTableName', $importJob->getTableName());
   }
 
   /**

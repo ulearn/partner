@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,13 +42,13 @@
  * contacts
  */
 class CRM_Contact_Form_Search extends CRM_Core_Form {
-  /*
-     * list of valid contexts
-     *
-     * @var array
-     * @static
-     */
 
+  /*
+   * list of valid contexts
+   *
+   * @var array
+   * @static
+   */
   static $_validContext = NULL;
 
   /**
@@ -116,7 +116,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   protected $_searchButtonName;
 
-  /**
+    /**
    * name of print button
    *
    * @var string
@@ -225,7 +225,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
   /**
    * name of the selector to use
    */
-  protected $_selectorName = 'CRM_Contact_Selector';
+  static $_selectorName = 'CRM_Contact_Selector';
   protected $_customSearchID = NULL;
   protected $_customSearchClass = NULL;
 
@@ -253,18 +253,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     return self::$_validContext;
   }
 
-  static
-  function isSearchContext($context) {
+  static function isSearchContext($context) {
     $searchContext = CRM_Utils_Array::value($context, self::validContext());
     return $searchContext ? TRUE : FALSE;
   }
 
-  function setModeValues() {
+  static function setModeValues() {
     if (!self::$_modeValues) {
       self::$_modeValues = array(
-        1 => array('selectorName' =>
-          (property_exists($this, '_selectorName') && $this->_selectorName) ?
-          $this->_selectorName : 'CRM_Contact_Selector',
+        1 => array(
+          'selectorName' => self::$_selectorName,
           'selectorLabel' => ts('Contacts'),
           'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
           'taskContext' => NULL,
@@ -318,9 +316,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'taskClassName' => 'CRM_Case_Task',
         ),
         7 => array(
-          'selectorName' =>
-          (property_exists($this, '_selectorName') && $this->_selectorName) ?
-          $this->_selectorName : 'CRM_Contact_Selector',
+          'selectorName' => self::$_selectorName,
           'selectorLabel' => ts('Related Contacts'),
           'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
           'taskContext' => NULL,
@@ -328,11 +324,20 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'resultContext' => NULL,
           'taskClassName' => 'CRM_Contact_Task',
         ),
+        8 => array(
+          'selectorName' => 'CRM_Mailing_Selector_Search',
+          'selectorLabel' => ts('Mailings'),
+          'taskFile' => "CRM/common/searchResultTasks.tpl",
+          'taskContext' => NULL,
+          'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
+          'resultContext' => 'Search',
+          'taskClassName' => 'CRM_Mailing_Task',
+        ),
       );
     }
   }
 
-  function getModeValue($mode = 1) {
+  static function getModeValue($mode = 1) {
     self::setModeValues();
 
     if (!array_key_exists($mode, self::$_modeValues)) {
@@ -342,7 +347,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     return self::$_modeValues[$mode];
   }
 
-  function getModeSelect() {
+  static function getModeSelect() {
     self::setModeValues();
 
     $select = array();
@@ -363,7 +368,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('view all activities')) {
       unset($select['4']);
     }
-
     return $select;
   }
 
@@ -376,21 +380,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   function buildQuickForm() {
     $permission = CRM_Core_Permission::getPermission();
-
     // some tasks.. what do we want to do with the selected contacts ?
     $tasks = array('' => ts('- actions -'));
-    if ($this->_componentMode == 1 ||
-      $this->_componentMode == 7
-    ) {
+    if ($this->_componentMode == 1 || $this->_componentMode == 7) {
       $tasks += CRM_Contact_Task::permissionedTaskTitles($permission,
-        CRM_Utils_Array::value('deleted_contacts',
-          $this->_formValues
-        )
+        CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
       );
     }
     else {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->_modeValue['taskClassName']) . '.php');
-      eval('$tasks += ' . $this->_modeValue['taskClassName'] . '::permissionedTaskTitles( $permission );');
+      $className = $this->_modeValue['taskClassName'];
+      $tasks += $className::permissionedTaskTitles($permission, false);
     }
 
     if (isset($this->_ssID)) {
@@ -398,10 +397,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
         $tasks = $tasks + CRM_Contact_Task::optionalTaskTitle();
       }
 
-      $search_custom_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch',
-        $this->_ssID,
-        'search_custom_id'
-      );
+      $search_custom_id =
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'search_custom_id');
 
       $savedSearchValues = array(
         'id' => $this->_ssID,
@@ -413,7 +410,34 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     }
 
     if ($this->_context === 'smog') {
+      // CRM-11788, we might want to do this for all of search where force=1
+      $formQFKey = CRM_Utils_Array::value('qfKey', $this->_formValues);
+      $getQFKey = CRM_Utils_Array::value('qfKey', $_GET);
+      $postQFKey = CRM_Utils_Array::value('qfKey', $_POST);
+      if ($formQFKey && empty($getQFKey) && empty($postQFKey)) {
+        $url = CRM_Utils_System::makeURL('qfKey') . $formQFKey;
+        CRM_Utils_System::redirect($url);
+      }
+
       if (!empty($this->_groupID)) {
+        $permissionForGroup = FALSE;
+
+        // check if user has permission to edit members of this group
+        $permission = CRM_Contact_BAO_Group::checkPermission($this->_groupID);
+        if ($permission && in_array(CRM_Core_Permission::EDIT, $permission)) {
+          $permissionForGroup = TRUE;
+        }
+
+        // check if _groupID exists, it might not if
+        // we are displaying a hidden group
+        if (!isset($this->_group[$this->_groupID])) {
+          $permissionForGroup = FALSE;
+          $this->_group[$this->_groupID] =
+            CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'title');
+        }
+
+        $this->assign('permissionedForGroup', $permissionForGroup);
+
         // set the group title
         $groupValues = array('id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]);
         $this->assign_by_ref('group', $groupValues);
@@ -428,6 +452,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           $ssMappingId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $ssID, 'mapping_id');
           $this->assign('ssMappingID', $ssMappingId);
         }
+
+        // Set dynamic page title for 'Show Members of Group'
+        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', array(1 => $this->_group[$this->_groupID])));
       }
 
       $group_contact_status = array();
@@ -441,24 +468,18 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       );
 
       $this->assign('permissionedForGroup', FALSE);
-      if (!empty($this->_groupID)) {
-        // Set dynamic page title for 'Show Members of Group'
-        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', array(1 => $this->_group[$this->_groupID])));
-
-        // check if user has permission to edit members of this group
-        $permission = CRM_Contact_BAO_Group::checkPermission($this->_groupID, $this->_group[$this->_groupID]);
-        if ($permission && in_array(CRM_Core_Permission::EDIT, $permission)) {
-          $this->assign('permissionedForGroup', TRUE);
-        }
-      }
     }
 
-    /*
-         * add the go button for the action form, note it is of type 'next' rather than of type 'submit'
-         *
-         */
-
+    // add the go button for the action form, note it is of type 'next' rather than of type 'submit'
     if ($this->_context === 'amtg') {
+        // check if _groupID exists, it might not if
+        // we are displaying a hidden group
+      if (!isset($this->_group[$this->_amtgID])) {
+        $this->assign('permissionedForGroup', FALSE);
+        $this->_group[$this->_amtgID] =
+          CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_amtgID, 'title');
+      }
+
       // Set dynamic page title for 'Add Members Group'
       CRM_Utils_System::setTitle(ts('Add to Group: %1', array(1 => $this->_group[$this->_amtgID])));
       // also set the group title and freeze the action task with Add Members to Group
@@ -554,10 +575,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    * @access public
    */
   function preProcess() {
-
-    /**
-     * set the varios class variables
-     */
+    // set the various class variables
 
     $this->_group = CRM_Core_PseudoConstant::group();
 
@@ -566,42 +584,22 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->_done = FALSE;
 
     /*
-         * we allow the controller to set force/reset externally, useful when we are being
-         * driven by the wizard framework
-         */
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
+     */
 
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean',
       CRM_Core_DAO::$_nullObject
     );
 
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    );
-
-    $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Positive',
-      $this
-    );
-    $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive',
-      $this
-    );
-    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive',
-      $this
-    );
-    $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String',
-      $this
-    );
-    $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this
-    );
-    $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive',
-      $this,
-      FALSE, 1, $_REQUEST
-    );
-    $this->_operator = CRM_Utils_Request::retrieve('operator', 'String',
-      $this,
-      FALSE, 1, $_REQUEST,
-      'AND'
-    );
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+    $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive', $this);
+    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
+    $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
+    $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, 1, $_REQUEST);
+    $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, 1, $_REQUEST, 'AND');
 
     /**
      * set the button names
@@ -628,10 +626,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $this->_ufGroupID = $config->defaultSearchProfileID;
     }
 
-    /*
-         * assign context to drive the template display, make sure context is valid
-         */
-
+    // assign context to drive the template display, make sure context is valid
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
     if (!CRM_Utils_Array::value($this->_context, self::validContext())) {
       $this->_context = 'search';
@@ -639,10 +634,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->set('context', $this->_context);
     $this->assign('context', $this->_context);
 
-    $this->_modeValue = $this->getModeValue($this->_componentMode);
+    $this->_modeValue = self::getModeValue($this->_componentMode);
     $this->assign($this->_modeValue);
 
-    $this->set('selectorName', $this->_selectorName);
+    $this->set('selectorName', self::$_selectorName);
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -716,9 +711,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
         // just like they build their own form elements
         foreach (array(
           'mailing_id', 'mailing_delivery_status', 'mailing_open_status',
-            'mailing_click_status', 'mailing_reply_status', 'mailing_optout',
-            'mailing_forward', 'mailing_unsubscribe', 'mailing_date_low',
-            'mailing_date_high',
+          'mailing_click_status', 'mailing_reply_status', 'mailing_optout',
+          'mailing_forward', 'mailing_unsubscribe', 'mailing_date_low',
+          'mailing_date_high',
           ) as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
@@ -750,42 +745,39 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
 
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
     if (!CRM_Utils_Array::value('deleted_contacts', $this->_formValues)) {
-      $menuItems          = CRM_Contact_BAO_Contact::contextMenu();
-      $primaryActions     = CRM_Utils_Array::value('primaryActions', $menuItems, array());
+      $menuItems = CRM_Contact_BAO_Contact::contextMenu();
+      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, array());
       $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, array());
       $this->assign('contextMenu', $primaryActions + $this->_contextMenu);
     }
 
-    // CRM_Core_Error::debug( 'f', $this->_formValues );
-    // CRM_Core_Error::debug( 'p', $this->_params );
     if (!isset($this->_componentMode)) {
       $this->_componentMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
-    $modeValues = $this->getModeValue($this->_componentMode);
+    $modeValues = self::getModeValue($this->_componentMode);
 
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->_modeValue['selectorName']) . '.php');
-    $this->_selectorName = $this->_modeValue['selectorName'];
+    self::$_selectorName = $this->_modeValue['selectorName'];
 
     $setDynamic = FALSE;
-    if (strpos($this->_selectorName, 'CRM_Contact_Selector') !== FALSE) {
-      eval('$selector = new ' . $this->_selectorName .
-        '( $this->_customSearchClass,
-                     $this->_formValues,
-                     $this->_params,
-                     $this->_returnProperties,
-                     $this->_action,
-                     false, true,
-                     $this->_context,
-                     $this->_contextMenu );'
+    if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+      $selector = new self::$_selectorName(
+        $this->_customSearchClass,
+        $this->_formValues,
+        $this->_params,
+        $this->_returnProperties,
+        $this->_action,
+        false, true,
+        $this->_context,
+        $this->_contextMenu
       );
       $setDynamic = TRUE;
     }
     else {
-      eval('$selector = new ' . $this->_selectorName .
-        '( $this->_params,
-                     $this->_action,
-                     null, false, null,
-                     "search", "advanced" );'
+      $selector = new self::$_selectorName(
+        $this->_params,
+        $this->_action,
+        null, false, null,
+        "search", "advanced"
       );
     }
 
@@ -840,16 +832,20 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   function postProcess() {
     /*
-         * sometime we do a postProcess early on, so we dont need to repeat it
-         * this will most likely introduce some more bugs :(
-         */
+     * sometime we do a postProcess early on, so we dont need to repeat it
+     * this will most likely introduce some more bugs :(
+     */
 
     if ($this->_done) {
       return;
     }
     $this->_done = TRUE;
 
-    if (array_key_exists($this->_searchButtonName, $_POST)) {
+    //for prev/next pagination
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+
+    if (array_key_exists($this->_searchButtonName, $_POST) ||
+      ($this->_force && !$crmPID)) {
       //reset the cache table for new search
       $cacheKey = "civicrm search {$this->controller->_key}";
       CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey);
@@ -891,15 +887,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
 
     if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
-
       // hack, make sure we reset the task values
-      $stateMachine = &$this->controller->getStateMachine();
+      $stateMachine = $this->controller->getStateMachine();
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
     }
     else {
-
       $output = CRM_Core_Selector_Controller::SESSION;
 
       // create the selector, controller and run - store results in session
@@ -910,43 +904,40 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
 
       $setDynamic = FALSE;
 
-      if (strpos($this->_selectorName, 'CRM_Contact_Selector') !== FALSE) {
-        eval('$selector = new ' . $this->_selectorName .
-          '( $this->_customSearchClass,
-                         $this->_formValues,
-                         $this->_params,
-                         $this->_returnProperties,
-                         $this->_action,
-                         false,
-                         $searchChildGroups,
-                         $this->_context,
-                         $this->_contextMenu );'
+      if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+        $selector = new self::$_selectorName (
+          $this->_customSearchClass,
+          $this->_formValues,
+          $this->_params,
+          $this->_returnProperties,
+          $this->_action,
+          false,
+          $searchChildGroups,
+          $this->_context,
+          $this->_contextMenu
         );
         $setDynamic = TRUE;
       }
       else {
-        eval('$selector = new ' . $this->_selectorName .
-          '( $this->_params,
-                         $this->_action,
-                         null, false, null,
-                         "search", "advanced" );'
+        $selector = new  self::$_selectorName (
+          $this->_params,
+          $this->_action,
+          null,
+          false,
+          null,
+          "search",
+          "advanced"
         );
       }
 
       $selector->setKey($this->controller->_key);
 
       // added the sorting  character to the form array
-      // lets recompute the aToZ bar without the sortByCharacter
-      // we need this in most cases except when just pager or sort values change, which
-      // we'll ignore for now
       $config = CRM_Core_Config::singleton();
       // do this only for contact search
-      if ($setDynamic &&
-        $config->includeAlphabeticalPager
-      ) {
-        if ($this->_reset ||
-          ($this->_sortByCharacter === NULL || $this->_sortByCharacter == '')
-        ) {
+      if ($setDynamic && $config->includeAlphabeticalPager) {
+        // Don't recompute if we are just paging/sorting
+        if ($this->_reset || (empty($_GET['crmPID']) && empty($_GET['crmSID']) && !$this->_sortByCharacter)) {
           $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($selector, $this->_sortByCharacter);
           $this->set('AToZBar', $aToZBar);
         }
