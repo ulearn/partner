@@ -59,7 +59,11 @@ define( 'CIVICRM_UF'               , 'Drupal'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
+<<<<<<< HEAD
+define( 'CIVICRM_UF_DSN'           , 'mysql://drupaluser:@localhost:33066/partner?new_link=true' );
+=======
 define( 'CIVICRM_UF_DSN'           , 'mysql://partner_admin:Aracna5bia@localhost/partner_drupal?new_link=true' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * CiviCRM Database Settings
@@ -79,10 +83,12 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://partner_admin:Aracna5bia@localhost
  *      CiviCRM DB Name = civicrm, CiviCRM DB User = civicrm
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
- define( 'CIVICRM_DSN'          , 'mysql://class_admin:Pa22w0rd@localhost/class_civitemp?new_link=true' );
-
  */
+<<<<<<< HEAD
+define( 'CIVICRM_DSN'          , 'mysql://drupaluser:@localhost:33066/civicrm?new_link=true' );
+=======
 define( 'CIVICRM_DSN'          , 'mysql://stage_admin:Aracna5bia*@localhost/stage_civikey?new_link=true' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * CiviCRM Logging Database
@@ -134,8 +140,13 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 
 global $civicrm_root;
 
+<<<<<<< HEAD
+$civicrm_root = 'C:/Users/Neil/Sites/dev_partner/sites/all/modules/civicrm';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:/Users/Neil/Sites/dev_partner\\sites\\default\\files\\civicrm\\templates_c\\' );
+=======
 $civicrm_root = '/home/partner/public_html/sites/all/modules/civicrm';
 define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/partner/public_html/sites/default/files/civicrm/templates_c/' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * Site URLs:
@@ -161,6 +172,11 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/partner/public_html/sites/default/
  * Front-end site:
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/' );
  *
+<<<<<<< HEAD
+ */
+define( 'CIVICRM_UF_BASEURL'      , 'http://partner:8082/' );
+=======
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 define( 'CIVICRM_UF_BASEURL'      , 'http://partner.ulearnschool.com/' );
  */
@@ -171,7 +187,7 @@ define( 'CIVICRM_UF_BASEURL'      , 'http://partner.ulearnschool.com/' );
  * We recommend using a 16-32 bit alphanumeric/punctuation key.
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
-define( 'CIVICRM_SITE_KEY', '916f469de94a9c707b644cc0f5af31fb' );
+define( 'CIVICRM_SITE_KEY', '7d7a9e105562acf2912294db1aa12b77' );
 
 /*
  * If you want to disable IDS, set this to 0.
@@ -189,7 +205,7 @@ define( 'CIVICRM_MAIL_SMARTY', 0 );
  * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
  * This will not send any email, so ensure this is commented out in production
  */
-// define( 'CIVICRM_MAIL_LOG', '/home/class/public_html/sites/default/files/civicrm/templates_c//mail.log' );
+// define( 'CIVICRM_MAIL_LOG', 'C:/Users/Neil/Sites/dev_partner\\sites\\default\\files\\civicrm\\templates_c\\/mail.log' );
 
 define( 'CIVICRM_DOMAIN_ID'      , 1 );
 
