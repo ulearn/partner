@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,11 +61,11 @@ class CRM_Queue_ErrorPolicy {
     }
     set_error_handler(array($this, 'onError'), $this->level);
     // FIXME make this temporary/reversible
-    CRM_Core_Error::setRaiseException();
+    $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
 
   function deactivate() {
-    // FIXME: undo CRM_Core_Error::setRaiseException()
+    $this->errorScope = NULL;
     restore_error_handler();
     foreach (array(
       'display_errors', 'html_errors', 'xmlrpc_errors') as $key) {
@@ -123,7 +123,7 @@ class CRM_Queue_ErrorPolicy {
     $response = array(
       'is_error' => 1,
       'is_continue' => 0,
-      'message' => sprintf('Error %s: %s in %s, line %s', $error['type'], $error['message'], $error['file'], $error['line']),
+      'exception' => htmlentities(sprintf('Error %s: %s in %s, line %s', $error['type'], $error['message'], $error['file'], $error['line'])),
     );
     global $activeQueueRunner;
     if (is_object($activeQueueRunner)) {
@@ -137,20 +137,22 @@ class CRM_Queue_ErrorPolicy {
   /**
    * Print an unhandled exception
    *
-   * @param $error
+   * @param $e
    */
-  function reportException($e) {
+  function reportException(Exception $e) {
+    CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
+
     $response = array(
       'is_error' => 1,
       'is_continue' => 0,
     );
 
     $config = CRM_Core_Config::singleton();
-    if ($config->backtrace) {
-      $response['message'] = $e->getMessage() . "\n" . $e->getTraceAsString();
+    if ($config->backtrace || CRM_Core_Config::isUpgradeMode()) {
+      $response['exception'] = CRM_Core_Error::formatHtmlException($e);
     }
     else {
-      $response['message'] = $e->getMessage();
+      $response['exception'] = htmlentities($e->getMessage());
     }
 
     global $activeQueueRunner;
@@ -158,10 +160,6 @@ class CRM_Queue_ErrorPolicy {
       $response['last_task_title'] = $activeQueueRunner->lastTaskTitle;
     }
     echo json_encode($response);
-
-    // unconditionally log backtrace
-    $response['message'] = $e->getMessage() . "\n" . $e->getTraceAsString();
-    CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', $response);
     CRM_Utils_System::civiExit();
   }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -36,11 +36,7 @@
 /**
  * Drupal specific stuff goes here
  */
-class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
-  function __construct() {
-    $this->is_drupal = TRUE;
-    $this->supports_form_extensions = TRUE;
-  }
+class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
    * Function to create a user in Drupal.
@@ -54,7 +50,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
    *
    */
   function createUser(&$params, $mail) {
-    $form_state = array();
+    $form_state = form_state_defaults();
+    
     $form_state['input'] = array(
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
@@ -63,14 +60,24 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
 
     $admin = user_access('administer users');
     if (!variable_get('user_email_verification', TRUE) || $admin) {
-            $form_state['input']['pass'] = array('pass1'=>$params['cms_pass'],'pass2'=>$params['cms_pass']);
+      $form_state['input']['pass'] = array('pass1'=>$params['cms_pass'],'pass2'=>$params['cms_pass']);
+    }
+
+    if(!empty($params['notify'])){
+      $form_state['input']['notify'] = $params['notify'];
     }
 
     $form_state['rebuild'] = FALSE;
     $form_state['programmed'] = TRUE;
+    $form_state['complete form'] = FALSE;
     $form_state['method'] = 'post';
     $form_state['build_info']['args'] = array();
-
+    /*
+    * if we want to submit this form more than once in a process (e.g. create more than one user)
+    * we must force it to validate each time for this form. Otherwise it will not validate
+    * subsequent submissions and the manner in which the password is passed in will be invalid
+    * */
+    $form_state['must_validate'] = TRUE;
     $config = CRM_Core_Config::singleton();
 
     // we also need to redirect b
@@ -79,7 +86,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     $form = drupal_retrieve_form('user_register_form', $form_state);
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
-
+    $form['#array_parents'] = array();
+    $form['#tree'] = FALSE;
     drupal_process_form('user_register_form', $form, $form_state);
 
     $config->inCiviCRM = FALSE;
@@ -87,17 +95,15 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     if (form_get_errors()) {
       return FALSE;
     }
-    else {
-      return $form_state['user']->uid;
-    }
+    return $form_state['user']->uid;
   }
 
   /*
-     *  Change user name in host CMS
-     *
-     *  @param integer $ufID User ID in CMS
-     *  @param string $ufName User name
-     */
+   *  Change user name in host CMS
+   *
+   *  @param integer $ufID User ID in CMS
+   *  @param string $ufName User name
+   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -155,8 +161,9 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
           array(':mail' => $params['mail'])
         )->fetchField();
         if ((bool) $uid) {
-          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
-            array(1 => $params['mail'])
+          $resetUrl = $config->userFrameworkBaseURL . 'user/password';
+          $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+            array(1 => $params['mail'], 2 => $resetUrl)
           );
         }
       }
@@ -164,13 +171,13 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
   }
 
   /*
-     * Function to get the drupal destination string. When this is passed in the
-     * URL the user will be directed to it after filling in the drupal form
-     *
-     * @param object $form Form object representing the 'current' form - to which the user will be returned
-     * @return string $destination destination value for URL
-     *
-     */
+   * Function to get the drupal destination string. When this is passed in the
+   * URL the user will be directed to it after filling in the drupal form
+   *
+   * @param object $form Form object representing the 'current' form - to which the user will be returned
+   * @return string $destination destination value for URL
+   *
+   */
   function getLoginDestination(&$form) {
     $args = NULL;
 
@@ -200,6 +207,26 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     }
     return $destination;
   }
+
+  /**
+   * Get user login URL for hosting CMS (method declared in each CMS system class)
+   *
+   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   *
+   * @return string - loginURL for the current CMS
+   * @static
+   */
+  public function getLoginURL($destination = '') {
+    $config = CRM_Core_Config::singleton();
+    $loginURL = $config->userFrameworkBaseURL;
+    $loginURL .= 'user';
+    if (!empty($destination)) {
+      // append destination so user is returned to form they came from after login
+      $loginURL .= '?destination=' . urlencode($destination);
+    }
+    return $loginURL;
+  }
+
 
   /**
    * sets the title of the page
@@ -269,8 +296,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
    *
    * @return void
    * @access public
-   *
-   * @todo Not Drupal 7 compatible
    */
   function addHTMLHead($header) {
     static $count = 0;
@@ -285,33 +310,101 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append a <SCRIPT SRC> to the <HEAD>
+   * Add a script file
    *
-   * On D7, drupal_add_html_head puts markup too high.
-   * It's better if scripts added this way load late in
-   * the process.
+   * @param $url: string, absolute path to file
+   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @access public
    */
-  public function addHtmlHeadScriptUrl($url, $weight) {
-    $weightOffset = 1000;
-    drupal_add_js($url, array(
-     'type' => 'external',
-     'weight' => $weightOffset = $weight,
-    ));
+  public function addScriptUrl($url, $region) {
+    $params = array('group' => JS_LIBRARY, 'weight' => 10);
+    switch ($region) {
+      case 'html-header':
+      case 'page-footer':
+        $params['scope'] = substr($region, 5);
+        break;
+      default:
+        return FALSE;
+    }
+    // If the path is within the drupal directory we can use the more efficient 'file' setting
+    $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
+    drupal_add_js($url, $params);
+    return TRUE;
   }
 
   /**
-   * Append a <SCRIPT>...</SCRIPT> to the <HEAD>
+   * Add an inline script
    *
-   * On D7, drupal_add_html_head puts markup too high.
-   * It's better if scripts added this way load late in
-   * the process.
+   * @param $code: string, javascript code
+   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @access public
    */
-  public function addHtmlHeadScriptCode($code, $weight) {
-    $weightOffset = 1000;
-    drupal_add_js($code, array(
-     'type' => 'inline',
-     'weight' => $weightOffset = $weight,
-    ));
+  public function addScript($code, $region) {
+    $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
+    switch ($region) {
+      case 'html-header':
+      case 'page-footer':
+        $params['scope'] = substr($region, 5);
+        break;
+      default:
+        return FALSE;
+    }
+    drupal_add_js($code, $params);
+    return TRUE;
+  }
+
+  /**
+   * Add a css file
+   *
+   * @param $url: string, absolute path to file
+   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @access public
+   */
+  public function addStyleUrl($url, $region) {
+    if ($region != 'html-header') {
+      return FALSE;
+    }
+    $params = array();
+    // If the path is within the drupal directory we can use the more efficient 'file' setting
+    $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
+    drupal_add_css($url, $params);
+    return TRUE;
+  }
+
+  /**
+   * Add an inline style
+   *
+   * @param $code: string, css code
+   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
+   * @access public
+   */
+  public function addStyle($code, $region) {
+    if ($region != 'html-header') {
+      return FALSE;
+    }
+    $params = array('type' => 'inline');
+    drupal_add_css($code, $params);
+    return TRUE;
   }
 
   /**
@@ -343,91 +436,18 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
     return $this->url($_GET['q']);
   }
 
-  /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE
-  ) {
-    $config = CRM_Core_Config::singleton();
-    $script = 'index.php';
-
-    $path = CRM_Utils_String::stripPathChars($path);
-
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
-    }
-
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-    $separator = $htmlize ? '&amp;' : '&';
-
-    if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
-        }
-        else {
-          return $base . $script . '?q=' . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $path . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-  }
 
   /**
    * Authenticate the user against the drupal db
    *
    * @param string $name     the user name
    * @param string $password the password for the above user name
-   * @param $loadCMSBootstrap boolean load cms bootstrap?
+   * @param boolean $loadCMSBootstrap load cms bootstrap?
+   * @param NULL|string $realPath filename of script
    *
    * @return mixed false if no auth
    *               array(
-      contactID, ufID, unique string ) if success
+   *  contactID, ufID, unique string ) if success
    * @access public
    */
    static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
@@ -435,17 +455,12 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
 
     $config = CRM_Core_Config::singleton();
 
-
-
     $dbDrupal = DB::connect($config->userFrameworkDSN);
     if (DB::isError($dbDrupal)) {
       CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
-
-
-
     if ($loadCMSBootstrap) {
       $bootStrapParams = array();
       if ($name && $password) {
@@ -466,7 +481,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_Base {
       // CRM-8638
       // SOAP cannot load drupal bootstrap and hence we do it the old way
       // Contact CiviSMTP folks if we run into issues with this :)
-      $cmsPath = $this->cmsRootPath($realPath);
+      $cmsPath = $config->userSystem->cmsRootPath($realPath);
 
       require_once ("$cmsPath/includes/bootstrap.inc");
       require_once ("$cmsPath/includes/password.inc");
@@ -505,20 +520,20 @@ AND    u.status = 1
     }
     return FALSE;
   }
+
   /*
-    * Load user into session
-    */
+   * Load user into session
+   */
   function loadUser($username) {
     global $user;
 
     $user = user_load_by_name($username);
 
     if (empty($user->uid)) {
-
       return FALSE;
-
     }
 
+    $uid = $user->uid;
     $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
 
     // lets store contact id and user id in session
@@ -526,6 +541,33 @@ AND    u.status = 1
     $session->set('ufID', $uid);
     $session->set('userID', $contact_id);
     return TRUE;
+  }
+
+  /**
+   * Perform any post login activities required by the UF -
+   * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
+   * calls hook_user op 'login' and generates a new session.
+   *
+   * @param array params
+   *
+   * FIXME: Document values accepted/required by $params
+   */
+  function userLoginFinalize($params = array()){
+    user_login_finalize($params);
+  }
+
+  /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $user = user_load_by_name($username);
+    if (empty($user->uid)) {
+      return NULL;
+    }
+    return $user->uid;
   }
 
   /**
@@ -572,20 +614,26 @@ AND    u.status = 1
   function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // sometimes for CLI based on order called, this might not be set and/or empty
     global $language;
-    switch (TRUE) {
-      case $language->language == 'zh-hans':
-        return 'zh_CN';
 
-      case $language->language == 'zh-hant':
-        return 'zh_TW';
-
-      case preg_match('/^.._..$/', $language->language):
-        return $language->language;
-
-      default:
-        return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
+    if (empty($language)) {
+      return NULL;
     }
+
+    if ($language->language == 'zh-hans') {
+      return 'zh_CN';
+    }
+
+    if ($language->language == 'zh-hant') {
+      return 'zh_TW';
+    }
+
+    if (preg_match('/^.._..$/', $language->language)) {
+      return $language->language;
+    }
+
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
   function getVersion() {
@@ -595,36 +643,42 @@ AND    u.status = 1
   /**
    * load drupal bootstrap
    *
-   * @param $params array with uid or name and password
-   * @param $loadUser boolean load cms user?
-   * @param $throwError throw error on failure?
+   * @param array $params Either uid, or name & pass.
+   * @param boolean $loadUser boolean Require CMS user load.
+   * @param boolean $throwError If true, print error on failure and exit.
+   * @param boolean|string $realPath path to script
    */
-  function loadBootStrap($params = array(
-    ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
     if (!file_exists("$cmsPath/includes/bootstrap.inc")) {
       if ($throwError) {
-        echo '<br />Sorry, could not able to locate bootstrap.inc.';
+        echo '<br />Sorry, could not locate bootstrap.inc\n';
         exit();
       }
       return FALSE;
     }
-
     // load drupal bootstrap
     chdir($cmsPath);
     define('DRUPAL_ROOT', $cmsPath);
+
+    // For drupal multi-site CRM-11313
+    if ($realPath && strpos($realPath, 'sites/all/modules/') === FALSE) {
+      preg_match('@sites/([^/]*)/modules@s', $realPath, $matches);
+      if (!empty($matches[1])) {
+        $_SERVER['HTTP_HOST'] = $matches[1];
+      }
+    }
     require_once 'includes/bootstrap.inc';
-    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    // @ to suppress notices eg 'DRUPALFOO already defined'.
+    @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
     // explicitly setting error reporting, since we cannot handle drupal related notices
     error_reporting(1);
-    if (!function_exists('module_exists') ||
-      !module_exists('civicrm')
-    ) {
+    if (!function_exists('module_exists') || !module_exists('civicrm')) {
       if ($throwError) {
-        echo '<br />Sorry, could not able to load drupal bootstrap.';
+        echo '<br />Sorry, could not load drupal bootstrap.';
         exit();
       }
       return FALSE;
@@ -632,8 +686,6 @@ AND    u.status = 1
 
     // seems like we've bootstrapped drupal
     $config = CRM_Core_Config::singleton();
-
-
 
     // lets also fix the clean url setting
     // CRM-6948
@@ -681,7 +733,8 @@ AND    u.status = 1
       exit();
     }
 
-    // CRM-6948: When using loadBootStrap, it's implicit that CiviCRM has already loaded its settings, which means that define(CIVICRM_CLEANURL) was correctly set.
+    // CRM-6948: When using loadBootStrap, it's implicit that CiviCRM has already loaded its settings
+    // which means that define(CIVICRM_CLEANURL) was correctly set.
     // So we correct it
     $config = CRM_Core_Config::singleton();
     $config->cleanURL = (int)variable_get('clean_url', '0');
@@ -692,8 +745,10 @@ AND    u.status = 1
     return FALSE;
   }
 
+  /**
+   *
+   */
   function cmsRootPath($scriptFilename = NULL) {
-
     $cmsRoot = $valid = NULL;
 
     if (!is_null($scriptFilename)) {
@@ -779,10 +834,7 @@ AND    u.status = 1
    * @return string $url, formatted url.
    * @static
    */
-  function languageNegotiationURL($url,
-    $addLanguagePart = TRUE,
-    $removeLanguagePart = FALSE
-  ) {
+  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -815,7 +867,7 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = CRM_Utils_File::addTrailingSlash($language->domain, '/');
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
@@ -865,10 +917,83 @@ AND    u.status = 1
    */
   function getModules() {
     $result = array();
-    $q = db_query('SELECT name, status FROM system WHERE type = \'module\' AND schema_version <> -1');
+    $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
       $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
     }
     return $result;
+  }
+
+  /**
+   * Wrapper for og_membership creation
+   *
+   * @param integer $ogID Organic Group ID
+   * @param integer $drupalID drupal User ID
+   */
+  function og_membership_create($ogID, $drupalID){
+    if (function_exists('og_entity_query_alter')) {
+      // sort-of-randomly chose a function that only exists in the // 7.x-2.x branch
+      //
+      // @TODO Find more solid way to check - try system_get_info('module', 'og').
+      //
+      // Also, since we don't know how to get the entity type of the // group, we'll assume it's 'node'
+      og_group('node', $ogID, array('entity' => user_load($drupalID)));
+    }
+    else {
+      // Works for the OG 7.x-1.x branch
+      og_group($ogID, array('entity' => user_load($drupalID)));
+    }
+  }
+
+  /**
+   * Wrapper for og_membership deletion
+   *
+   * @param integer $ogID Organic Group ID
+   * @param integer $drupalID drupal User ID
+   */
+  function og_membership_delete($ogID, $drupalID) {
+    if (function_exists('og_entity_query_alter')) {
+      // sort-of-randomly chose a function that only exists in the 7.x-2.x branch
+      // TODO: Find a more solid way to make this test
+      // Also, since we don't know how to get the entity type of the group, we'll assume it's 'node'
+      og_ungroup('node', $ogID, 'user', user_load($drupalID));
+    } else {
+      // Works for the OG 7.x-1.x branch
+      og_ungroup($ogID, 'user', user_load($drupalID));
+    }
+  }
+
+  /**
+   * Get timezone from Drupal
+   * @return boolean|string
+   */
+  function getTimeZoneOffset(){
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    } else {
+      $timezone = variable_get('date_default_timezone', null);
+    }
+    $tzObj = new DateTimeZone($timezone);
+    $dateTime = new DateTime("now", $tzObj);
+    $tz = $tzObj->getOffset($dateTime);
+
+    if(empty($tz)){
+      return false;
+    }
+
+    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, ($tz/60)%60 );
+
+    if($timeZoneOffset > 0){
+      $timeZoneOffset = '+' . $timeZoneOffset;
+    }
+    return $timeZoneOffset;
+  }
+  /**
+   * Reset any system caches that may be required for proper CiviCRM
+   * integration.
+   */
+  function flush() {
+    drupal_flush_all_caches();
   }
 }

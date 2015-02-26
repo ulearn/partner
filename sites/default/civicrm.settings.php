@@ -59,7 +59,11 @@ define( 'CIVICRM_UF'               , 'Drupal'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
+<<<<<<< HEAD
 define( 'CIVICRM_UF_DSN'           , 'mysql://drupaluser:@localhost:33066/partner?new_link=true' );
+=======
+define( 'CIVICRM_UF_DSN'           , 'mysql://partner_admin:Aracna5bia@localhost/partner_drupal?new_link=true' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * CiviCRM Database Settings
@@ -80,7 +84,11 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://drupaluser:@localhost:33066/partne
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
+<<<<<<< HEAD
 define( 'CIVICRM_DSN'          , 'mysql://drupaluser:@localhost:33066/civicrm?new_link=true' );
+=======
+define( 'CIVICRM_DSN'          , 'mysql://stage_admin:Aracna5bia*@localhost/stage_civikey?new_link=true' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * CiviCRM Logging Database
@@ -132,8 +140,13 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 
 global $civicrm_root;
 
+<<<<<<< HEAD
 $civicrm_root = 'C:/Users/Neil/Sites/dev_partner/sites/all/modules/civicrm';
 define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:/Users/Neil/Sites/dev_partner\\sites\\default\\files\\civicrm\\templates_c\\' );
+=======
+$civicrm_root = '/home/partner/public_html/sites/all/modules/civicrm';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/partner/public_html/sites/default/files/civicrm/templates_c/' );
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
 /**
  * Site URLs:
@@ -159,9 +172,15 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'C:/Users/Neil/Sites/dev_partner\\sites\\
  * Front-end site:
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/' );
  *
+<<<<<<< HEAD
  */
 define( 'CIVICRM_UF_BASEURL'      , 'http://partner:8082/' );
+=======
+>>>>>>> b1ca09b07cb0064f2e8a27f5f7d724b7b2123b47
 
+define( 'CIVICRM_UF_BASEURL'      , 'http://partner.ulearnschool.com/' );
+ */
+ 
 /*
  * If you are using any CiviCRM script in the bin directory that
  * requires authentication, then you also need to set this key.
@@ -279,5 +298,3 @@ if ($memLimit >= 0 and $memLimit < 134217728) {
     ini_set('memory_limit', '128M');
 }
 
-require_once 'CRM/Core/ClassLoader.php';
-CRM_Core_ClassLoader::singleton()->register();

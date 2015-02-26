@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_BAO_SearchCustom {
 
-  static
-  function details($csID, $ssID = NULL, $gID = NULL) {
+  static function details($csID, $ssID = NULL, $gID = NULL) {
     $error = array(NULL, NULL, NULL);
 
     if (!$csID &&
@@ -71,7 +70,7 @@ class CRM_Contact_BAO_SearchCustom {
       return $error;
     }
 
-    $ext = new CRM_Core_Extensions();
+    $ext = CRM_Extension_System::singleton()->getMapper();
 
     if (!$ext->isExtensionKey($customSearchClass)) {
       $customSearchFile = str_replace('_',
@@ -92,8 +91,7 @@ class CRM_Contact_BAO_SearchCustom {
     return array($customSearchID, $customSearchClass, $formValues);
   }
 
-  static
-  function customClass($csID, $ssID) {
+  static function customClass($csID, $ssID) {
     list($customSearchID, $customSearchClass, $formValues) = self::details($csID, $ssID);
 
     if (!$customSearchID) {
@@ -101,19 +99,17 @@ class CRM_Contact_BAO_SearchCustom {
     }
 
     // instantiate the new class
-    eval('$customClass = new ' . $customSearchClass . '( $formValues );');
+    $customClass = new $customSearchClass( $formValues );
 
     return $customClass;
   }
 
-  static
-  function contactIDSQL($csID, $ssID) {
+  static function contactIDSQL($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
     return $customClass->contactIDs();
   }
 
-  static
-  function &buildFormValues($args) {
+  static function &buildFormValues($args) {
     $args = trim($args);
 
     $values = explode("\n", $args);
@@ -127,8 +123,7 @@ class CRM_Contact_BAO_SearchCustom {
     return $formValues;
   }
 
-  static
-  function fromWhereEmail($csID, $ssID) {
+  static function fromWhereEmail($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
 
     $from = $customClass->from();

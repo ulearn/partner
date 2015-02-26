@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,13 +32,15 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+class CRM_Core_Payment_PaymentExpressUtils {
+
 function _valueXml($element, $value = NULL) {
   $nl = "\n";
 
   if (is_array($element)) {
     $xml = '';
     foreach ($element as $elem => $value) {
-      $xml .= _valueXml($elem, $value);
+        $xml .= self::_valueXml($elem, $value);
     }
     return $xml;
   }
@@ -71,8 +73,9 @@ function &_initCURL($query, $url) {
 
   if (strtoupper(substr(@php_uname('s'), 0, 3)) === 'WIN') {
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
   }
   return $curl;
 }
 
+}

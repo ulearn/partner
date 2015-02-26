@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                               |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -56,7 +56,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
     //get the contact and event id and assing to session.
     $values = array();
-    $csContactID = $eventId = NULL;
+    $csContactID = NULL;
     if ($this->_participantId) {
       $params = array('id' => $this->_participantId);
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Participant', $params, $values,
@@ -64,7 +64,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       );
     }
 
-    $this->_participantStatusId = $values['status_id'];
+    $this->_participantStatusId = CRM_Utils_Array::value('status_id', $values);
     $this->_eventId = CRM_Utils_Array::value('event_id', $values);
     $csContactId = CRM_Utils_Array::value('contact_id', $values);
 
@@ -114,8 +114,8 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
       //need to confirm that though participant confirming
       //registration - but is there enough space to confirm.
-      $emptySeats   = CRM_Event_BAO_participant::pendingToConfirmSpaces($this->_eventId);
-      $additonalIds = CRM_Event_BAO_participant::getAdditionalParticipantIds($this->_participantId);
+      $emptySeats   = CRM_Event_BAO_Participant::pendingToConfirmSpaces($this->_eventId);
+      $additonalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
       $requireSpace = 1 + count($additonalIds);
       if ($emptySeats !== NULL && ($requireSpace > $emptySeats)) {
         $statusMsg = ts("Oops, it looks like there are currently no available spaces for the %1 event.", array(1 => $values['title']));
@@ -173,7 +173,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   public function postProcess() {
     //get the button.
     $buttonName    = $this->controller->getButtonName();
-    $eventId       = $this->_eventId;
     $participantId = $this->_participantId;
 
     if ($buttonName == '_qf_ParticipantConfirm_next') {
@@ -185,7 +184,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
       //check user registration status is from pending class
       $url = CRM_Utils_System::url('civicrm/event/register',
-        "reset=1&id={$eventId}&participantId={$participantId}"
+        "reset=1&id={$this->_eventId}&participantId={$participantId}"
       );
       CRM_Utils_System::redirect($url);
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -44,8 +44,7 @@ class CRM_Contact_BAO_Contact_Permission {
    * @access public
    * @static
    */
-  static
-  function allow($id, $type = CRM_Core_Permission::VIEW) {
+  static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
     $whereTables = array();
 
@@ -92,8 +91,7 @@ WHERE contact_a.id = %1 AND $permission";
    * @access public
    * @static
    */
-  static
-  function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
+  static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
 
     if ($type = CRM_Core_Permission::VIEW) {
@@ -160,8 +158,7 @@ ON DUPLICATE KEY UPDATE
    * @access public
    * @static
    */
-  static
-  function hasContactsInCache($type = CRM_Core_Permission::VIEW,
+  static function hasContactsInCache($type = CRM_Core_Permission::VIEW,
     $contactID = NULL
   ) {
     if (!$contactID) {
@@ -191,8 +188,7 @@ AND    $operationClause LIMIT 1";
     return (bool) CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
-  static
-  function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
+  static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
@@ -247,20 +243,70 @@ AND    $operationClause LIMIT 1";
    * selected contact record else false
    * @static
    */
-  static
-  function relationship($selectedContactID, $contactID = NULL) {
+  static function relationship($selectedContactID, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
     if (!$contactID) {
       $contactID = $session->get('userID');
       if (!$contactID) {
         return FALSE;
       }
     }
-    if ($contactID == $selectedContactID) {
+    if ($contactID == $selectedContactID && CRM_Core_Permission::check('edit my contact')) {
       return TRUE;
     }
     else {
-      $query = "
+      if ($config->secondDegRelPermissions) {
+        $query = "
+SELECT firstdeg.id
+FROM   civicrm_relationship firstdeg
+LEFT JOIN civicrm_relationship seconddegaa
+  on firstdeg.contact_id_a = seconddegaa.contact_id_b
+  and seconddegaa.is_permission_b_a = 1
+  and firstdeg.is_permission_b_a = 1
+  and seconddegaa.is_active = 1
+LEFT JOIN civicrm_relationship seconddegab
+  on firstdeg.contact_id_a = seconddegab.contact_id_a
+  and seconddegab.is_permission_a_b = 1
+  and firstdeg.is_permission_b_a = 1
+  and seconddegab.is_active = 1
+LEFT JOIN civicrm_relationship seconddegba
+  on firstdeg.contact_id_b = seconddegba.contact_id_b
+  and seconddegba.is_permission_b_a = 1
+  and firstdeg.is_permission_a_b = 1
+  and seconddegba.is_active = 1
+LEFT JOIN civicrm_relationship seconddegbb
+  on firstdeg.contact_id_b = seconddegbb.contact_id_a
+  and seconddegbb.is_permission_a_b = 1
+  and firstdeg.is_permission_a_b = 1
+  and seconddegbb.is_active = 1
+WHERE
+  (
+    ( firstdeg.contact_id_a = %1 AND firstdeg.contact_id_b = %2 AND firstdeg.is_permission_a_b = 1 )
+    OR ( firstdeg.contact_id_a = %2 AND firstdeg.contact_id_b = %1 AND firstdeg.is_permission_b_a = 1 )
+    OR (
+      firstdeg.contact_id_a = %1 AND seconddegba.contact_id_a = %2
+      AND (seconddegba.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_a = %1 AND seconddegbb.contact_id_b = %2
+      AND (seconddegbb.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_b = %1 AND seconddegab.contact_id_b = %2
+      AND (seconddegab.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+    OR (
+      firstdeg.contact_id_b = %1 AND seconddegaa.contact_id_a = %2      AND (seconddegaa.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+    )
+  )
+  AND (firstdeg.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+  AND (firstdeg.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
+  AND ( firstdeg.is_active = 1)
+      ";
+      }
+      else {
+        $query = "
 SELECT id
 FROM   civicrm_relationship
 WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
@@ -269,6 +315,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
        (contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
   AND  ( civicrm_relationship.is_active = 1 )
 ";
+      }
       $params = array(1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );
@@ -277,8 +324,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   }
 
 
-  static
-  function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
+  static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
     // check if this is of the format cs=XXX
     if (!CRM_Contact_BAO_Contact_Utils::validChecksum($contactID,
         CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
@@ -297,16 +343,31 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
       return FALSE;
     }
 
+    // set appropriate AUTH source
+    self::initChecksumAuthSrc(TRUE, $form);
+
     // so here the contact is posing as $contactID, lets set the logging contact ID variable
     // CRM-8965
     CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
       array(1 => array($contactID, 'Integer'))
     );
+    
     return TRUE;
   }
 
-  static
-  function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
+  static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
+    $session = CRM_Core_Session::singleton();
+    if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
+      // if result is already validated, and url has cs, set the flag.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+    } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
+      // if checksum wasn't present in REQUEST OR checksum result validated as FALSE, 
+      // and flag was already set exactly as AUTH_SRC_CHECKSUM, unset it.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_UNKNOWN);
+    }
+  }
+
+  static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
     if (!self::allow($contactID, CRM_Core_Permission::EDIT)) {
       // check if this is of the format cs=XXX
       return self::validateOnlyChecksum($contactID, $form, $redirect);

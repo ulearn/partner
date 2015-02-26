@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 /**
- * Dummy page for details of PHone
+ * Dummy page for details of Phone
  *
  */
-class CRM_Contact_Page_Inline_Phone {
+class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
 
   /**
    * Run the page.
@@ -52,8 +52,8 @@ class CRM_Contact_Page_Inline_Phone {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $locationTypes = CRM_Core_PseudoConstant::locationDisplayName();
-    $phoneTypes = CRM_Core_PseudoConstant::phoneType();
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     $entityBlock = array('contact_id' => $contactId);
     $phones = CRM_Core_BAO_Phone::getValues($entityBlock);
@@ -74,18 +74,15 @@ class CRM_Contact_Page_Inline_Phone {
       }
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $template->assign('contactId', $contactId);
-    $template->assign('phone', $phones);
-    $template->assign('privacy', $privacy);
+    $this->assign('contactId', $contactId);
+    $this->assign('phone', $phones);
+    $this->assign('privacy', $privacy);
 
     // check logged in user permission
-    $page = new CRM_Core_Page();
-    CRM_Contact_Page_View::checkUserPermission($page, $contactId);
-    $template->append($page);
-    
-    echo $content = $template->fetch('CRM/Contact/Page/Inline/Phone.tpl');
-    CRM_Utils_System::civiExit();
+    CRM_Contact_Page_View::checkUserPermission($this, $contactId);
+
+    // finally call parent
+    parent::run();
   }
 }
 

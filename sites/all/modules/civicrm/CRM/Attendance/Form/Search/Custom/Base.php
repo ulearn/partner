@@ -1,39 +1,5 @@
 <?php
 
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 3.1                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2010
- * $Id$
- *
- */
-
 require_once 'CRM/Attendance/Form/Search/Interface.php';
 
 class CRM_Attendance_Form_Search_Custom_Base {
@@ -43,26 +9,26 @@ class CRM_Attendance_Form_Search_Custom_Base {
     protected $_columns;
 
     function __construct( &$formValues ) {
-        $this->_formValues =& $formValues;
+      $this->_formValues =& $formValues;
     }
 
     function count( ) {
-        return CRM_Core_DAO::singleValueQuery( $this->sql( 'count(distinct contact_a.id) as total' ),
+      return CRM_Core_DAO::singleValueQuery( $this->sql( 'count(distinct contact_a.id) as total' ),
                                                CRM_Core_DAO::$_nullArray );
     }
 
     function summary( ) {
-        return null;
+      return null;
     }
 
     function contactIDs( $offset = 0, $rowcount = 0, $sort = null) {
-        $sql    = $this->sql( 'contact_a.id as contact_id',
-                              $offset, $rowcount, $sort );
-        $this->validateUserSQL( $sql );
+      $sql    = $this->sql( 'contact_a.id as contact_id',
+                            $offset, $rowcount, $sort );
+      $this->validateUserSQL( $sql );
 
-        return CRM_Core_DAO::composeQuery( $sql,
-                                           CRM_Core_DAO::$_nullArray,
-                                           true );
+      return CRM_Core_DAO::composeQuery( $sql,
+                                         CRM_Core_DAO::$_nullArray,
+                                         true );
     }
 
     function sql( $selectClause,
